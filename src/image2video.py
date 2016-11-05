@@ -39,11 +39,12 @@ def image2video(images, outvid=None, fps=5, size=None,
 if __name__ == "__main__":
     ## !!!WARNING!!!
     ## the only digits in the filename must be the frame number
-    imageDir = "../data/frames_styled/"
-    images = [imageDir + imageName for imageName in os.listdir(imageDir)]
+    imageDir = "../data/frames_naive/"
+    images = [imageDir + imageName for imageName in os.listdir(imageDir)
+                if ".jpg" in imageName]
 
     ## sort image files according to frame number
     images.sort(key=lambda name: int(re.sub("\D", "", name)))
 
     ## convert to video
-    image2video(images, outvid="../data/styled_test.mp4")
+    image2video(images, outvid="../data/styled_naive_test.mp4")
