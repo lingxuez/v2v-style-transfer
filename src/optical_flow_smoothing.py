@@ -27,12 +27,12 @@ def naive_smooth(frames):
 
     # read the first frame
     prev = cv2.imread(frames[0])
-    prevgray = cv2.cvtColor(prev, cv2.COLOR_BGR2GRAY)
+    prevgray = cv2.cvtColor(prev, cv2.COLOR_RGB2GRAY)
 
     for i in range(1, len(frames)):
         # the next image
         new = cv2.imread(frames[i])
-        newgray = cv2.cvtColor(new, cv2.COLOR_BGR2GRAY)
+        newgray = cv2.cvtColor(new, cv2.COLOR_RGB2GRAY)
 
         # forward flow
         flow = cv2.calcOpticalFlowFarneback(prevgray, newgray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
@@ -48,7 +48,7 @@ def naive_smooth(frames):
         #ch = 0xFF & cv2.waitKey(5)
         #if ch == 27:
         #    break
-        if i > 20:
+        if i > 100:
             break
 
     return
@@ -56,7 +56,7 @@ def naive_smooth(frames):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--org_frame_dir", default="../data/frames/")
+    parser.add_argument("--org_frame_dir", default="../data/frames_2/")
     parser.add_argument("--styled_frame_dir", default="../data/styled_frames/")
     args = parser.parse_args()
 
