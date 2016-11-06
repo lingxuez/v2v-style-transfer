@@ -40,7 +40,8 @@ def smooth_naive(images, styledim, threshold, size, outdir, outprefix = "frame")
         styimgnew.flags.writeable = True  
         if i > 0:
             diff = abs(imgnew - imgold)
-            styimgnew[diff < threshold] = styimgold[diff < threshold]  
+            diff = np.sum(diff,axis = 2)           
+            styimgnew[diff < threshold] = styimgold[diff < threshold] 
         im = Image.fromarray(styimgnew)      
         im.save("%s%s%d.jpg" % (outdir, outprefix, i*10))          
         imgold = imgnew
@@ -50,14 +51,14 @@ def smooth_naive(images, styledim, threshold, size, outdir, outprefix = "frame")
 
 if __name__ == "__main__":    
      imageDir = "../data/frames/"
-     images = [imageDir + imageName for imageName in os.listdir(imageDir)]
+     images = [imageDir + imageName for imageName in os.listdir(imageDir) if imageName != '.DS_Store']
      images.sort(key=lambda name: int(re.sub("\D", "", name))) 
    
      sty_imageDir = "../data/frames_styled/"
-     sty_images = [sty_imageDir + imageName for imageName in os.listdir(sty_imageDir)]
+     sty_images = [sty_imageDir + imageName for imageName in os.listdir(sty_imageDir) if imageName != '.DS_Store']
      sty_images.sort(key=lambda name: int(re.sub("\D", "", name)))
      
      outDir = "../data/frames_naive/"
      
-     smooth_naive(images, sty_images, 10, 1024, outDir)
+     smooth_naive(images, sty_images, 100, 1024, outDir)
 
