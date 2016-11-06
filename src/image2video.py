@@ -39,18 +39,14 @@ def image2video(images, outvid=None, fps=5, size=None,
 if __name__ == "__main__":
     ## !!!WARNING!!!
     ## the only digits in the filename must be the frame number
-<<<<<<< HEAD
     imageDir = "../data/frames_optic/"
     images = [imageDir + imageName for imageName in os.listdir(imageDir) if imageName != ".DS_Store"]
-=======
-    imageDir = "../data/frames_naive/"
-    images = [imageDir + imageName for imageName in os.listdir(imageDir)
-                if ".jpg" in imageName]
->>>>>>> d8d36bbfa4b723f5b1b4fb5028b9ac563d91ba6c
+    #imageDir = "../data/frames_naive/"
+    #images = [imageDir + imageName for imageName in os.listdir(imageDir) if ".jpg" in imageName]
 
-    ## sort image files according to frame number
+    # sort image files according to frame number
     images.sort(key=lambda name: int(re.sub("\D", "", name)))
 
     ## convert to video
-    #image2video(images, outvid="../data/star_optic_test.mp4")
-    image2video(images, outvid="../data/styled_naive_test.mp4")
+    image2video(images, outvid="../data/star_optic_test.mp4")
+    #image2video(images, outvid="../data/styled_naive_test.mp4")
