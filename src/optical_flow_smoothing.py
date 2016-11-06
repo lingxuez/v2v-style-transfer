@@ -18,7 +18,7 @@ def draw_flow(img, flow, step=16):
     return vis
 
 
-def naive_smooth(frames):
+def naive_smooth(frames, styled_frames):
     """
 
     :param frames: a list strings. each is a frame path
@@ -26,47 +26,54 @@ def naive_smooth(frames):
     """
 
     # read the first frame
-    prev = cv2.imread(frames[0])
-    prevgray = cv2.cvtColor(prev, cv2.COLOR_RGB2GRAY)
+    prevgray = cv2.imread(frames[0], 0)
+    prevstyled = cv2.imread(styled_frames[0])
 
     for i in range(1, len(frames)):
         # the next image
-        new = cv2.imread(frames[i])
-        newgray = cv2.cvtColor(new, cv2.COLOR_RGB2GRAY)
+        gray = cv2.imread(frames[i], 0)
+        styled = cv2.imread(styled_frames[i])
 
         # forward flow
-        flow = cv2.calcOpticalFlowFarneback(prevgray, newgray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-        v = flow[..., 0]
+        flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 4, 3, 7, 1.5, 0)
+        v, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
+        neg_indexes = np.asarray(v) < 0.1
+        #print len(neg_indexes)
+        newstyled = 1 * styled + 0.0 * prevstyled
+        newstyled[neg_indexes] = 0.0 * styled[neg_indexes] + 1 * prevstyled[neg_indexes]
+
+        cv2.imwrite("optic_{0}.png".format(i), newstyled)
+        prevgray = gray
+        prevstyled = newstyled
+
+        #v[neg_indexes] = 0
 
         #v = np.power(fx, 2) + np.power(fy, 2)
-        v = cv2.normalize(v, None, 0, 255, cv2.NORM_MINMAX)
-        print np.max(v), np.mean(v)
-        cv2.imwrite('test_flow_{0}.png'.format(i), v)
-
-        #print flow[0][0][0], flow[0][0][1]
-        #cv2.imshow('Optical flow', draw_flow(newgray, flow))
-        #ch = 0xFF & cv2.waitKey(5)
-        #if ch == 27:
-        #    break
-        if i > 100:
-            break
+        #v = cv2.normalize(v, None, 0, 255, cv2.NORM_MINMAX)
+        #print np.max(v), np.mean(v)
+        #cv2.imwrite('test_flow_{0}.png'.format(i), v)
 
     return
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--org_frame_dir", default="../data/frames_2/")
-    parser.add_argument("--styled_frame_dir", default="../data/styled_frames/")
+    parser.add_argument("--org_frame_dir", default="../data/frames/")
+    parser.add_argument("--styled_frame_dir", default="../data/frames_styled/")
     args = parser.parse_args()
 
     # original frame file paths
-    frames = [args.org_frame_dir + '/' + imageName for imageName in os.listdir(args.org_frame_dir)]
+    frames = [args.org_frame_dir + '/' + imageName for imageName in os.listdir(args.org_frame_dir)
+              if imageName != ".DS_Store"]
+
+    styled_frames = [args.styled_frame_dir + '/' + imageName for imageName in os.listdir(args.styled_frame_dir)
+                     if imageName != ".DS_Store"]
 
     # sort frame files according to frame number
     frames.sort(key=lambda name: int(re.sub("\D", "", name)))
+    styled_frames.sort(key=lambda name: int(re.sub("\D", "", name)))
 
-    naive_smooth(frames)
+    naive_smooth(frames, styled_frames)
 
 
 if __name__ == '__main__':
