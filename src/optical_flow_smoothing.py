@@ -37,7 +37,7 @@ def naive_smooth(frames, styled_frames):
         # forward flow
         flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 4, 3, 7, 1.5, 0)
         v, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
-        neg_indexes = np.asarray(v) < 0.1
+        neg_indexes = np.asarray(v) < 0.05
         #print len(neg_indexes)
         newstyled = 1 * styled + 0.0 * prevstyled
         newstyled[neg_indexes] = 0.0 * styled[neg_indexes] + 1 * prevstyled[neg_indexes]
@@ -59,7 +59,7 @@ def naive_smooth(frames, styled_frames):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--org_frame_dir", default="../data/frames/")
-    parser.add_argument("--styled_frame_dir", default="../data/frames_styled/")
+    parser.add_argument("--styled_frame_dir", default="../data/frames_styled_star/")
     args = parser.parse_args()
 
     # original frame file paths
