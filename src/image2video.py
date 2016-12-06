@@ -41,13 +41,13 @@ def image2video(images, outvid=None, fps=5, size=None,
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "Usage: python image2video.py <input_dir/> <output_video>"
+        print "Usage: python image2video.py <input_dir> <output_video>"
 
     imageDir = sys.argv[1]
     output = sys.argv[2]
 
     ## the only digits in the filename must be the frame number
-    images = [imageDir + imageName for imageName in os.listdir(imageDir) 
+    images = [imageDir + "/" + imageName for imageName in os.listdir(imageDir) 
                         if imageName != ".DS_Store"]
     # sort image files according to frame number
     images.sort(key=lambda name: int(re.sub("\D", "", name)))

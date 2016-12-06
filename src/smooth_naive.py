@@ -3,12 +3,21 @@ import os, re
 import argparse
 from PIL import Image
 
-def load_image(path, size):
+def load_image(path, size=None):
+    """
+    If size is None: no re-sizing is performed.
+    Otherwise it is a tuple (h, w), 
+    and the output is forced to be the same width and height.
+    """
+
     #coppied from Github, Feifei's method
     #size and crop are not used for now
     image = Image.open(path).convert('RGB')
     
-    #w,h = image.size
+    ## re-sizing
+    if size is not None:
+        image = image.resize((size[1], size[0]), Image.ANTIALIAS)
+
     #if w < h:
     #    if w < size:
     #        image = image.resize((size, size*h/w))
@@ -34,10 +43,16 @@ def smooth_naive(images, styledim, threshold, size, outdir, outprefix = "frame")
             raise IOError(image)
         if not os.path.exists(styimage):
             raise IOError(styimage)
-        imgnew = load_image(image, size)
-        imgnew.flags.writeable = True  
-        styimgnew = load_image(styimage, size)
-        styimgnew.flags.writeable = True  
+
+        ## style image 
+        styimgnew = load_image(styimage)
+        styimgnew.flags.writeable = True 
+
+        ## source image
+        ## down-size if style image is compressed
+        imgnew = load_image(image, size=styimgnew.shape[:2])
+        imgnew.flags.writeable = True 
+
         if i > 0:
             diff = abs(imgnew - imgold)
             diff = np.sum(diff,axis = 2)           
@@ -50,15 +65,15 @@ def smooth_naive(images, styledim, threshold, size, outdir, outprefix = "frame")
             
 
 if __name__ == "__main__":    
-     imageDir = "../data/frames/"
+     imageDir = "../data/bear/frames/"
      images = [imageDir + imageName for imageName in os.listdir(imageDir) if imageName != '.DS_Store']
      images.sort(key=lambda name: int(re.sub("\D", "", name))) 
    
-     sty_imageDir = "../data/frames_styled/"
+     sty_imageDir = "../data/bear/stylized_frames/"
      sty_images = [sty_imageDir + imageName for imageName in os.listdir(sty_imageDir) if imageName != '.DS_Store']
      sty_images.sort(key=lambda name: int(re.sub("\D", "", name)))
      
-     outDir = "../data/frames_naive/"
+     outDir = "../data/bear/stylized_naive_smooth_frames/"
      
      smooth_naive(images, sty_images, 100, 1024, outDir)
 
