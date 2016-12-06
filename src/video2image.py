@@ -15,4 +15,6 @@ def video2image(videoFile, outdir, extractGap, outprefix="frame"):
 
 
 if __name__ == "__main__":
-	video2image(videoFile='../data/test.MOV', outdir="../data/frames_2/", extractGap=3)
+	video2image(videoFile='../data/bear/bear.MOV', 
+		outdir="../data/bear/frames/", 
+		extractGap=3)
