@@ -8,7 +8,7 @@ def video2image(videoFile, outdir, extractGap, maxSize=512, outprefix="frame"):
 	success = True
 	while success:
 		success,image = vidcap.read()
-		if count % extractGap == 0:
+		if count % extractGap == 0 and image:
 			print 'Read a new frame: ', success
 
 			## re-size if too large
@@ -20,6 +20,6 @@ def video2image(videoFile, outdir, extractGap, maxSize=512, outprefix="frame"):
 
 
 if __name__ == "__main__":
-	video2image(videoFile='../data/bear/bear.MOV', 
-		outdir="../data/bear/frames/", 
-		extractGap=3, maxSize=512)
+	video2image(videoFile='../data/pig/pig.MOV', 
+		outdir="../data/pig/frames/", 
+		extractGap=1, maxSize=512)

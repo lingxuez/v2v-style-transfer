@@ -10,25 +10,30 @@ import sys, os, re
 from subprocess import call
 
 
-def style_transfer(matched, input_dir, style_dir, output_dir, niter=200, gpu=0):
+def style_transfer(matched, input_dir, style_dir, output_dir, niter=1000, gpu=0):
     """
     matched: a dictionary: key=input_frames, 
-        value=list of style frames to use for it
+        value=（list of style frames to use for it, weights for diff styles)
     input_dir: directory for input frames
     style_dir: directory for style frames
     output_dir: directory for output stylized frames
     """
 
     for input_frame in matched:
-        style_frames = map(lambda file: output_dir+"/"+file, matched[input_frame])
-        print "Style transfer for", input_frame, "from styles", ",".join(style_frames)
+        (style_frames, weights) = matched[input_frame]
+        style_frames = map(lambda file: style_dir+"/"+file, style_frames)
+        print "Style transfer for", input_frame, "from styles", ",".join(style_frames), \
+                "using weights", weights
 
-        call(["th neural_style.lua", 
-            "-centent_image", input_dir+"/"+input_frame, 
+        call(" ".join(["th neural_style.lua", 
+            "-content_image", input_dir+"/"+input_frame, 
+            "-init image",
             "-style_image", ",".join(style_frames),
+            "-style_blend_weights", ",".join(weights),
             "-output_image", output_dir+"/stylized-"+input_frame,
-            "-num_iterations", niter,
-            "-gpu", gpu])
+            "-num_iterations", str(niter),
+            "-save_iter", str(0), 
+            "-gpu", str(gpu)]), shell=True)
 
 
 def match_frames(input_frames, style_frames, window=2):
@@ -59,7 +64,13 @@ def match_frames(input_frames, style_frames, window=2):
             end += 1
             mid = (start + end) / 2
 
-        matched[input_frames[i]] = style_frames[start:end]
+        ## weight different styles according to their distance to input_time
+        weights = [0] * window
+        for k in range(window):
+            weights[k] = 1.0 / max(abs(input_times[i] - style_times[start+k]), 1e-2)
+        ## normalize to sum to 10
+        weights = [10 * w / sum(weights) for w in weights]
+        matched[input_frames[i]] = (style_frames[start:end], weights)
 
     return matched
 
@@ -80,19 +91,20 @@ if __name__ == "__main__":
     ## Note: the only digits in the filename must be the frame number
     if len(sys.argv) != 4:
         print """
-Usage: python merge_style_transfer_sw.py <input_frames_dir> <styles_dir> <output_dir> 
+Usage: python merge_style_transfer_sw.py <input_dir> <style_dir> <output_dir> 
        	"""
 
     input_dir = sys.argv[1]
     style_dir = sys.argv[2]
     output_dir = sys.argv[3]
-    print output_dir
         
-    # input_dir = "../data/bear/frames"
-    # style_dir = "../video2video/trailer/frames_lop"
+    # input_dir = "../data/pig/frames"
+    # style_dir = "../trailer/frames_lop"
     # output_dir = "../data/bear/stylized_frames"
 
     window = 2 ## how many style files to use at each time
+    niter = 1000
+    gpu = 0
 
     input_frames = images_in_dir(input_dir)
     style_frames = images_in_dir(style_dir)
@@ -101,7 +113,7 @@ Usage: python merge_style_transfer_sw.py <input_frames_dir> <styles_dir> <output
     matched = match_frames(input_frames, style_frames, window)
 
     ## style transfer
-    style_transfer(matched, input_dir, style_dir, output_dir)
+    style_transfer(matched, input_dir, style_dir, output_dir, niter, gpu)
 
 
 
