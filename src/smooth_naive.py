@@ -65,15 +65,15 @@ def smooth_naive(images, styledim, threshold, size, outdir, outprefix = "frame")
             
 
 if __name__ == "__main__":    
-     imageDir = "../data/bear/frames/"
+     imageDir = "../data/pig/frames/"
      images = [imageDir + imageName for imageName in os.listdir(imageDir) if imageName != '.DS_Store']
      images.sort(key=lambda name: int(re.sub("\D", "", name))) 
    
-     sty_imageDir = "../data/bear/stylized_frames/"
+     sty_imageDir = "../data/pig/5m_frames/"
      sty_images = [sty_imageDir + imageName for imageName in os.listdir(sty_imageDir) if imageName != '.DS_Store']
      sty_images.sort(key=lambda name: int(re.sub("\D", "", name)))
      
-     outDir = "../data/bear/stylized_naive_smooth_frames/"
+     outDir = "../data/pig/5m_naive_smooth_frames/"
      
      smooth_naive(images, sty_images, 100, 1024, outDir)
 

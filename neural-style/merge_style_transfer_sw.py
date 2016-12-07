@@ -13,7 +13,7 @@ from subprocess import call
 def style_transfer(matched, input_dir, style_dir, output_dir, niter=1000, gpu=0):
     """
     matched: a dictionary: key=input_frames, 
-        value=（list of style frames to use for it, weights for diff styles)
+        value=(list of style frames to use for it, weights for diff styles)
     input_dir: directory for input frames
     style_dir: directory for style frames
     output_dir: directory for output stylized frames
@@ -29,7 +29,7 @@ def style_transfer(matched, input_dir, style_dir, output_dir, niter=1000, gpu=0)
             "-content_image", input_dir+"/"+input_frame, 
             "-init image",
             "-style_image", ",".join(style_frames),
-            "-style_blend_weights", ",".join(weights),
+            "-style_blend_weights", ",".join(map(str, weights)),
             "-output_image", output_dir+"/stylized-"+input_frame,
             "-num_iterations", str(niter),
             "-save_iter", str(0), 
@@ -72,6 +72,8 @@ def match_frames(input_frames, style_frames, window=2):
         weights = [10 * w / sum(weights) for w in weights]
         matched[input_frames[i]] = (style_frames[start:end], weights)
 
+        # print input_frames[i], (start, end-1), weights 
+
     return matched
 
 
@@ -89,22 +91,22 @@ def images_in_dir(input_dir, ext="jpg"):
 
 if __name__ == "__main__":
     ## Note: the only digits in the filename must be the frame number
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 5:
         print """
-Usage: python merge_style_transfer_sw.py <input_dir> <style_dir> <output_dir> 
+Usage: python merge_style_transfer_sw.py <input_dir> <style_dir> <output_dir> <gpu> 
        	"""
 
     input_dir = sys.argv[1]
     style_dir = sys.argv[2]
     output_dir = sys.argv[3]
-        
-    # input_dir = "../data/pig/frames"
-    # style_dir = "../trailer/frames_lop"
-    # output_dir = "../data/bear/stylized_frames"
+    gpu = sys.argv[4] 
+
+#    input_dir = "../data/pig/frames"
+#    style_dir = "../bigfish/frames_bigfish"
+#    output_dir = "../data/bear/stylized_frames"
 
     window = 2 ## how many style files to use at each time
     niter = 1000
-    gpu = 0
 
     input_frames = images_in_dir(input_dir)
     style_frames = images_in_dir(style_dir)
