@@ -2,7 +2,7 @@
 ## WARNING: the only digits in the filename must be the frame number
 
 from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
-import os, sys, exceptions, re
+import os, sys, exceptions, re, argparse
 
 def image2video(images, outvid=None, fps=15, size=None,
                is_color=True, format="mp4v"):
@@ -40,18 +40,19 @@ def image2video(images, outvid=None, fps=15, size=None,
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print "Usage: python image2video.py <input_dir> <output_video>"
-
-    imageDir = sys.argv[1]
-    output = sys.argv[2]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input_frame_dir", default="../data/pig/frames/")
+    parser.add_argument("-o", "--output", default="../data/pig/pig.mp4")
+    parser.add_argument("-f", "--fps", default=15)
+    args = parser.parse_args()
 
     ## the only digits in the filename must be the frame number
-    images = [imageDir + "/" + imageName for imageName in os.listdir(imageDir) 
+    images = [args.input_frame_dir + "/" + imageName 
+            for imageName in os.listdir(args.input_frame_dir) 
                         if imageName != ".DS_Store"]
     # sort image files according to frame number
     images.sort(key=lambda name: int(re.sub("\D", "", name)))
 
     ## convert to video
-    image2video(images, outvid=output)
+    image2video(images, outvid=args.output, fps=args.fps)
 

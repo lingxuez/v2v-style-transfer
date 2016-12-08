@@ -58,7 +58,7 @@ def smooth_naive(images, styledim, threshold, size, outdir, outprefix = "frame")
             diff = np.sum(diff,axis = 2)           
             styimgnew[diff < threshold] = styimgold[diff < threshold] 
         im = Image.fromarray(styimgnew)      
-        im.save("%s%s%d.jpg" % (outdir, outprefix, i))          
+        im.save("%s/%s%d.jpg" % (outdir, outprefix, i))          
         imgold = imgnew
         styimgold = styimgnew
         
