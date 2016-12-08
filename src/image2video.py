@@ -4,7 +4,7 @@
 from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
 import os, sys, exceptions, re
 
-def image2video(images, outvid=None, fps=5, size=None,
+def image2video(images, outvid=None, fps=15, size=None,
                is_color=True, format="mp4v"):
     """
     Create a video from a list of images.

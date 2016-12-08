@@ -58,9 +58,9 @@ def naive_smooth(frames, styled_frames, output_dir):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--org_frame_dir", default="../data/frames/")
-    parser.add_argument("--styled_frame_dir", default="../data/frames_styled_star/")
-    parser.add_argument("--output_dir", default="./")
+    parser.add_argument("-i", "--org_frame_dir", default="../data/frames/")
+    parser.add_argument("-s", "--styled_frame_dir", default="../data/frames_styled_star/")
+    parser.add_argument("-o", "--output_dir", default="./")
     args = parser.parse_args()
 
     # original frame file paths
@@ -73,6 +73,9 @@ def main():
     # sort frame files according to frame number
     frames.sort(key=lambda name: int(re.sub("\D", "", name)))
     styled_frames.sort(key=lambda name: int(re.sub("\D", "", name)))
+
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
 
     naive_smooth(frames, styled_frames, args.output_dir)
 

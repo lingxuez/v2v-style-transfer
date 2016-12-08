@@ -58,22 +58,29 @@ def smooth_naive(images, styledim, threshold, size, outdir, outprefix = "frame")
             diff = np.sum(diff,axis = 2)           
             styimgnew[diff < threshold] = styimgold[diff < threshold] 
         im = Image.fromarray(styimgnew)      
-        im.save("%s%s%d.jpg" % (outdir, outprefix, i*10))          
+        im.save("%s%s%d.jpg" % (outdir, outprefix, i))          
         imgold = imgnew
         styimgold = styimgnew
         
             
 
-if __name__ == "__main__":    
-     imageDir = "../data/pig/frames/"
-     images = [imageDir + imageName for imageName in os.listdir(imageDir) if imageName != '.DS_Store']
-     images.sort(key=lambda name: int(re.sub("\D", "", name))) 
-   
-     sty_imageDir = "../data/pig/5m_frames/"
-     sty_images = [sty_imageDir + imageName for imageName in os.listdir(sty_imageDir) if imageName != '.DS_Store']
-     sty_images.sort(key=lambda name: int(re.sub("\D", "", name)))
-     
-     outDir = "../data/pig/5m_naive_smooth_frames/"
-     
-     smooth_naive(images, sty_images, 100, 1024, outDir)
+if __name__ == "__main__":  
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--org_frame_dir", default="../data/pig/frames/")
+    parser.add_argument("-s", "--styled_frame_dir", default="../data/pig/frames_styled/")
+    parser.add_argument("-o", "--output_dir", default="../data/pig/")
+    args = parser.parse_args()
+
+    images = [args.org_frame_dir + "/" + imageName 
+            for imageName in os.listdir(args.org_frame_dir) if imageName != '.DS_Store']
+    images.sort(key=lambda name: int(re.sub("\D", "", name))) 
+
+    sty_images = [args.styled_frame_dir + "/" + imageName 
+            for imageName in os.listdir(args.styled_frame_dir) if imageName != '.DS_Store']
+    sty_images.sort(key=lambda name: int(re.sub("\D", "", name)))
+
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
+
+    smooth_naive(images, sty_images, 100, 1024, args.output_dir)
 
