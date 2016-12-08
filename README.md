@@ -79,14 +79,15 @@ Note that paths to images should not contain the `~` character to represent your
 For example:
 ```
 cd neural-style
-python v2v_style_transfer.py -i ../data/pig/frames \
--s ../trailer/bigfish/frames_bigfish -o ../data/pig/bigfish_frames
+python v2v_style_transfer.py -input_dir ../data/pig/frames \
+    -style_dir ../trailer/bigfish/frames_bigfish \
+    -output_dir ../data/pig/bigfish_frames
 ```
 
 **Options**:
-* `-i`: Path to the input directory containing `.jpg` frames of the source video.
-* `-s`: Path to the style directory containing multiple `.jpg` style images. These are usually the keyframes of the style video (e.g. a movie trailer).
-* `-o`: Path to the output directory, which will contain the output of stylized `.jpg` frames.
+* `-input_dir`: Path to the input directory containing `.jpg` frames of the source video.
+* `-style_dir`: Path to the style directory containing multiple `.jpg` style images. These are usually the keyframes of the style video (e.g. a movie trailer).
+* `-output_dir`: Path to the output directory, which will contain the output of stylized `.jpg` frames.
 * `-method`: Either `"avg"` (uses average style representing the whole trailer) or `"sw"` (uses sliding window for style transitioning). Default is `"sw"`.
 * `-window`: Length of sliding window of styles to use if `method="sw"`. Default is 2. 
 * `-gpu`: Zero-indexed ID of the GPU to use; for CPU mode set `-gpu` to -1. Default is 0.

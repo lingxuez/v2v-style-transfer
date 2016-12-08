@@ -113,9 +113,9 @@ def images_in_dir(input_dir, ext="jpg"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input_frame_dir", default="../data/pig/frames")
-    parser.add_argument("-s", "--style_frame_dir", default="../trailers/5m/frames_5m")
-    parser.add_argument("-o", "--output_dir", default="../data/pig/5m_frames")
+    parser.add_argument("-input_dir", "--input_frame_dir", default="../data/pig/frames")
+    parser.add_argument("-style_dir", "--style_frame_dir", default="../trailers/5m/frames_5m")
+    parser.add_argument("-output_dir", "--output_dir", default="../data/pig/5m_frames")
     parser.add_argument("-method", "--method", default="sw")
     parser.add_argument("-niter", "--niter", default=1000)
     parser.add_argument("-gpu", "--gpu", default=0)
