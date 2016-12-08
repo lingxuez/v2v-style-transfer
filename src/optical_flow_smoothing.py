@@ -18,7 +18,7 @@ def draw_flow(img, flow, step=16):
     return vis
 
 
-def naive_smooth(frames, styled_frames):
+def naive_smooth(frames, styled_frames, output_dir):
     """
 
     :param frames: a list strings. each is a frame path
@@ -42,7 +42,7 @@ def naive_smooth(frames, styled_frames):
         newstyled = 1 * styled + 0.0 * prevstyled
         newstyled[neg_indexes] = 0.0 * styled[neg_indexes] + 1 * prevstyled[neg_indexes]
 
-        cv2.imwrite("optic_{0}.png".format(i), newstyled)
+        cv2.imwrite(output_dir + "/optic_{0}.png".format(i), newstyled)
         prevgray = gray
         prevstyled = newstyled
 
@@ -58,8 +58,9 @@ def naive_smooth(frames, styled_frames):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--org_frame_dir", default="../data/frames/")
-    parser.add_argument("--styled_frame_dir", default="../data/frames_styled_star/")
+    parser.add_argument("-i", "--org_frame_dir", default="../data/frames/")
+    parser.add_argument("-s", "--styled_frame_dir", default="../data/frames_styled_star/")
+    parser.add_argument("-o", "--output_dir", default="./")
     args = parser.parse_args()
 
     # original frame file paths
@@ -73,7 +74,10 @@ def main():
     frames.sort(key=lambda name: int(re.sub("\D", "", name)))
     styled_frames.sort(key=lambda name: int(re.sub("\D", "", name)))
 
-    naive_smooth(frames, styled_frames)
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
+
+    naive_smooth(frames, styled_frames, args.output_dir)
 
 
 if __name__ == '__main__':

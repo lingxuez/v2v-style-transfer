@@ -1,7 +1,10 @@
-from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
-import os, exceptions, re
+## Usage: python image2video.py input_dir output_video
+## WARNING: the only digits in the filename must be the frame number
 
-def image2video(images, outvid=None, fps=5, size=None,
+from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
+import os, sys, exceptions, re, argparse
+
+def image2video(images, outvid=None, fps=15, size=None,
                is_color=True, format="mp4v"):
     """
     Create a video from a list of images.
@@ -37,16 +40,19 @@ def image2video(images, outvid=None, fps=5, size=None,
 
 
 if __name__ == "__main__":
-    ## !!!WARNING!!!
-    ## the only digits in the filename must be the frame number
-    imageDir = "../data/frames_optic/"
-    images = [imageDir + imageName for imageName in os.listdir(imageDir) if imageName != ".DS_Store"]
-    #imageDir = "../data/frames_naive/"
-    #images = [imageDir + imageName for imageName in os.listdir(imageDir) if ".jpg" in imageName]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input_frame_dir", default="../data/pig/frames/")
+    parser.add_argument("-o", "--output", default="../data/pig/pig.mp4")
+    parser.add_argument("-f", "--fps", default=15)
+    args = parser.parse_args()
 
+    ## the only digits in the filename must be the frame number
+    images = [args.input_frame_dir + "/" + imageName 
+            for imageName in os.listdir(args.input_frame_dir) 
+                        if imageName != ".DS_Store"]
     # sort image files according to frame number
     images.sort(key=lambda name: int(re.sub("\D", "", name)))
 
     ## convert to video
-    image2video(images, outvid="../data/star_optic_test.mp4")
-    #image2video(images, outvid="../data/styled_naive_test.mp4")
+    image2video(images, outvid=args.output, fps=args.fps)
+
