@@ -79,7 +79,8 @@ Note that paths to images should not contain the `~` character to represent your
 For example:
 ```
 cd neural-style
-python v2v_style_transfer.py -i ../data/pig/frames -s ../trailer/bigfish/frames_bigfish -o ../data/pig/bigfish_frames
+python v2v_style_transfer.py -i ../data/pig/frames \
+-s ../trailer/bigfish/frames_bigfish -o ../data/pig/bigfish_frames
 ```
 
 **Options**:
