@@ -2,15 +2,37 @@
 ##
 ## Input: multiple keyframes from style video (e.g., movie trailer)
 ## Output: stylized frames for target video
-##       Each frame is stylized using blended multiple style keyframes;
-##       The keyframes are selected such that the style-transitioning
-##       is temporarilly consistent between target and style video.
+##       Each frame is stylized using blended multiple style keyframes.
 
-import sys, os, re
+import sys, os, re, argparse
 from subprocess import call
 
+def style_transfer_avg(input_frames, style_frames, 
+                input_dir, style_dir, output_dir, niter=1000, gpu=0):
+    """
+    input_frames: file names of original frame images
+    style_frames: file names of the keyframes as styles
+    input_dir: directory for input frames
+    style_dir: directory for style frames
+    output_dir: directory for output stylized frames
+    """
 
-def style_transfer(matched, input_dir, style_dir, output_dir, niter=1000, gpu=0):
+    for input_frame in input_frames:
+        style_frames = map(lambda file: style_dir+"/"+file, style_frames)
+        print "Style transfer for", input_dir+"/"+input_frame, \
+                "from styles", ",".join(style_frames)
+
+        call(" ".join(["th neural_style.lua", 
+            "-content_image", input_dir+"/"+input_frame, 
+            "-init image",
+            "-style_image", ",".join(style_frames),
+            "-output_image", output_dir+"/avg-stylized-"+input_frame,
+            "-num_iterations", str(niter),
+            "-save_iter", str(0), 
+            "-gpu", str(gpu)]), shell=True)
+
+
+def style_transfer_sw(matched, input_dir, style_dir, output_dir, niter=1000, gpu=0):
     """
     matched: a dictionary: key=input_frames, 
         value=(list of style frames to use for it, weights for diff styles)
@@ -90,32 +112,28 @@ def images_in_dir(input_dir, ext="jpg"):
 
 
 if __name__ == "__main__":
-    ## Note: the only digits in the filename must be the frame number
-    if len(sys.argv) != 5:
-        print """
-Usage: python merge_style_transfer_sw.py <input_dir> <style_dir> <output_dir> <gpu> 
-       	"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input_frame_dir", default="../data/pig/frames")
+    parser.add_argument("-s", "--style_frame_dir", default="../trailers/5m/frames_5m")
+    parser.add_argument("-o", "--output_dir", default="../data/pig/5m_frames")
+    parser.add_argument("-method", "--method", default="sw")
+    parser.add_argument("-niter", "--niter", default=1000)
+    parser.add_argument("-gpu", "--gpu", default=0)
+    parser.add_argument("-window", "--window", default=2)
+    args = parser.parse_args()
 
-    input_dir = sys.argv[1]
-    style_dir = sys.argv[2]
-    output_dir = sys.argv[3]
-    gpu = sys.argv[4] 
+    input_frames = images_in_dir(args.input_frame_dir)
+    style_frames = images_in_dir(args.style_frame_dir)
 
-#    input_dir = "../data/pig/frames"
-#    style_dir = "../bigfish/frames_bigfish"
-#    output_dir = "../data/bear/stylized_frames"
-
-    window = 2 ## how many style files to use at each time
-    niter = 1000
-
-    input_frames = images_in_dir(input_dir)
-    style_frames = images_in_dir(style_dir)
-
-    ## match which style files to use for which input frame
-    matched = match_frames(input_frames, style_frames, window)
-
-    ## style transfer
-    style_transfer(matched, input_dir, style_dir, output_dir, niter, gpu)
-
-
+    ## sliding window
+    if args.method == "sw":
+        ## match which style files to use for which input frame
+        matched = match_frames(input_frames, style_frames, args.window)
+        style_transfer_sw(matched, args.input_frame_dir, args.style_frame_dir, 
+                        args.output_dir, args.niter, args.gpu)
+        
+    ## average style
+    elif args.method == "avg":
+        style_transfer_avg(input_frames, style_frames, 
+            args.input_frame_dir, args.style_frame_dir, args.output_dir, args.niter, args.gpu)
 

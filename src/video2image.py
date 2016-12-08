@@ -1,4 +1,4 @@
-import cv2
+import cv2, argparse
 
 def video2image(videoFile, outdir, extractGap, maxSize=512, outprefix="frame"):
 
@@ -20,6 +20,12 @@ def video2image(videoFile, outdir, extractGap, maxSize=512, outprefix="frame"):
 
 
 if __name__ == "__main__":
-	video2image(videoFile='../data/pig/pig.MOV', 
-		outdir="../data/pig/frames/", 
-		extractGap=1, maxSize=512)
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-i", "--input_video", default="../data/pig/pig.MOV")
+	parser.add_argument("-o", "--output_dir", default="../data/pig/frames")
+	parser.add_argument("-g", "--gap", default=3)
+	parser.add_argument("-s", "--max_size", default=512)
+	args = parser.parse_args()
+
+	video2image(videoFile=args.input_video, outdir=args.output_dir, 
+			extractGap=args.gap, maxSize=args.max_size)
